@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Despesas 2025</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom, #f2f2f7, #ffffff);
+    color: #1c1c1e;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 30px 0 20px;
+    font-size: 2.5rem;
+    font-weight: 600;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .charts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin-bottom: 70px;
+  }
+
+  .chart-box {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(18px);
+    border-radius: 30px;
+    padding: 28px 20px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.05);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+  }
+
+  .chart-box.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    font-size: 1.3rem;
+    font-weight: 500;
+  }
+
+  canvas {
+    max-width: 100%;
+    height: 320px;
+  }
+
+  #chartResumo {
+    max-width: 340px;
+    max-height: 340px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.07);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+  }
+
+  .dock-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .dock-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background-color: #111; color: #fff; }
+    .chart-box { background: rgba(28,28,30,0.85); }
+    .dock { background: rgba(28,28,30,0.7); }
+    .dock-btn { color: #fff; }
+  }
+
+  @media (max-width: 650px) {
+    canvas { height: 280px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Despesas 2025</h1>
+  <div class="charts-container">
+    <div class="chart-box" id="boxSoma">
+      <h2>Total mensal</h2>
+      <canvas id="chartSoma"></canvas>
+    </div>
+    <div class="chart-box" id="boxLinhaCategoria">
+      <h2>Evolução Mensal por Categoria</h2>
+      <canvas id="chartLinhaCategoria"></canvas>
+    </div>
+    <div class="chart-box" id="boxResumo">
+      <h2>Média Anual</h2>
+      <canvas id="chartResumo"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="dock">
+  <a href="pessoal.html" class="dock-btn">
+    <!-- ícone SVG Pessoal -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+      1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+    </svg>
+    Pessoal
+  </a>
+  <a href="casa.html" class="dock-btn">
+    <!-- ícone SVG Casa -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+    </svg>
+    Casa
+  </a>
+  <a href="profissional.html" class="dock-btn">
+    <!-- ícone SVG Profissional -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+    </svg>
+    Profissional
+  </a>
+</div>
+
+<script>
+  async function carregarDados() {
+    const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRyBCKIqCRwswkUQP_or3WI1dOG3JyQGyousdaS_6w_lTyRjJSXXnl5PeMW5jq2lQ/pub?output=csv&gid=1936220883');
+    const csv = await res.text();
+    const linhas = csv.trim().split('\n');
+    const meses = [], agua=[], luz=[], portagens=[], net=[], soma=[];
+
+    linhas.slice(1).forEach(linha=>{
+      const c = linha.split(',');
+      meses.push(c[0]);
+      const a = parseFloat(c[1])||0, l=parseFloat(c[2])||0, p=parseFloat(c[3])||0, n=parseFloat(c[4])||0;
+      agua.push(a); luz.push(l); portagens.push(p); net.push(n);
+      soma.push(a+l+p+n);
+    });
+
+    const media = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+
+    const commonOptions = {
+      responsive:true,
+      plugins:{
+        datalabels:{ anchor:'end', align:'top', color:'#1c1c1e', formatter: val=>val.toLocaleString('pt-PT')+' €' },
+        tooltip:{ bodyFont:{ family:'-apple-system', size:14 } }
+      },
+      scales:{ y:{ beginAtZero:true, grid:{ color:'transparent' }, ticks:{ color:'#1c1c1e' } }, x:{ grid:{ color:'transparent' }, ticks:{ color:'#1c1c1e' } } },
+      animation: { duration:1200, easing:'easeOutQuart' }
+    };
+
+    // Gráfico Soma Mensal
+new Chart(document.getElementById('chartSoma').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: meses,
+    datasets: [{
+      label: 'Total em 2025',
+      data: soma,
+      fill: false, // sem preenchimento
+      borderColor: 'rgba(52,199,89,0.85)',
+      borderWidth: 2,
+      tension: 0.3,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }]
+  },
+  options: {
+    ...commonOptions,
+    plugins: {
+      ...commonOptions.plugins,
+      datalabels: {
+        display: true,
+        color: '#343434',
+        font: { 
+          family: 'Helvetica, Arial, sans-serif', // fonte clean
+          weight: 'normal', 
+          size: 12 
+        },
+        anchor: 'end',
+        align: 'top',
+        formatter: function(value) {
+          return value.toFixed(2); // duas casas decimais
+        }
+      }
+    },
+    elements: {
+      line: { borderCapStyle: 'round' }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+
+    // Evolução por Categoria
+new Chart(document.getElementById('chartLinhaCategoria').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: meses,
+    datasets: [
+      {
+        label: 'Água',
+        data: agua,
+        borderColor: 'rgba(52,199,89,0.85)',
+        fill: false,
+        tension: 0.25,
+        borderWidth: 2,
+        pointRadius: 3
+      },
+      {
+        label: 'Luz',
+        data: luz,
+        borderColor: 'rgba(255,149,0,0.85)',
+        fill: false,
+        tension: 0.25,
+        borderWidth: 2,
+        pointRadius: 3
+      },
+      {
+        label: 'Portagens',
+        data: portagens,
+        borderColor: 'rgba(255,59,48,0.85)',
+        fill: false,
+        tension: 0.25,
+        borderWidth: 2,
+        pointRadius: 3
+      },
+      {
+        label: 'Net',
+        data: net,
+        borderColor: 'rgba(88,86,214,0.85)',
+        fill: false,
+        tension: 0.25,
+        borderWidth: 2,
+        pointRadius: 3
+      }
+    ]
+  },
+  options: {
+    ...commonOptions,
+    plugins: {
+      ...commonOptions.plugins,
+      datalabels: {
+    display: function(context) {
+      // Não mostrar rótulos do dataset 'Net'
+      if (context.dataset.label === 'Net') return false;
+
+    },
+        color: '#343434',
+        font: { family: 'Helvetica, Arial, sans-serif', size: 12 },
+        anchor: 'end',
+        align: 'top',
+        offset: -4,
+        formatter: function(value) {
+          return value.toFixed(2);
+        }
+      }
+    },
+    elements: {
+      line: { borderCapStyle: 'round' },
+      point: { hoverRadius: 4 }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+
+
+    // Média Anual (Doughnut)
+new Chart(document.getElementById('chartResumo').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Água', 'Luz', 'Portagens', 'Net'],
+    datasets: [{
+      data: [media(agua), media(luz), media(portagens), media(net)],
+      backgroundColor: [
+        'rgba(52,199,89,0.7)',
+        'rgba(255,149,0,0.7)',
+        'rgba(255,59,48,0.7)',
+        'rgba(88,86,214,0.7)'
+      ],
+      borderColor: '#fff',
+      borderWidth: 2,
+      hoverOffset: 10
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: '65%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        align: 'center',
+        labels: {
+          color: '#1c1c1e',
+          boxWidth: 18,       // tamanho do quadrado colorido
+          boxHeight: 18,
+          padding: 15,        // espaçamento entre itens
+          font: {
+            family: 'Helvetica, Arial, sans-serif',
+            size: 13,
+            weight: '500'
+          }
+        }
+      },
+      datalabels: {
+        color: '#1c1c1e',
+        font: { family: 'Helvetica, Arial, sans-serif', size: 12, weight: '500' },
+        formatter: (val, ctx) => {
+          const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+          const pct = ((val / total) * 100).toFixed(1);
+          return `${val.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €\n(${pct}%)`;
+        },
+        anchor: 'center',
+        align: 'center'
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+    // Fade-in
+    document.querySelectorAll('.chart-box').forEach((b,i)=>setTimeout(()=>b.classList.add('show'), i*200));
+  }
+
+  carregarDados();
+</script>
+</body>
+</html>

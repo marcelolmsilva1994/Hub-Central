@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub Central</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #fafafa;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .hub-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 2rem;
+      color: #111;
+      margin-bottom: 30px;
+      letter-spacing: -0.5px;
+    }
+
+    .hub-btn {
+      width: 100%;
+      max-width: 400px;
+      padding: 18px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 25px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.85);
+      color: #111;
+      border: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .hub-btn:hover {
+      background: rgba(255,255,255,0.95);
+      transform: scale(1.03);
+    }
+
+    .hub-btn:active {
+      transform: scale(0.97);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .hub-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* Dock inferior estilo frosted glass */
+    .dock {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 12px 0;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(15px);
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .dock-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #111;
+      text-decoration: none;
+      gap: 4px;
+      transition: transform 0.2s;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .dock-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* Dark mode automático */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #111;
+        color: #fff;
+      }
+      .hub-btn {
+        background: rgba(28,28,30,0.85);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      }
+      .hub-btn:hover {
+        background: rgba(28,28,30,0.95);
+      }
+      .hub-btn svg, .dock-btn svg {
+        stroke: #fff;
+      }
+      .dock {
+        background: rgba(28,28,30,0.7);
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+      }
+      .dock-btn {
+        color: #fff;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hub-container {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hub-container">
+    <h1>Hub Central</h1>
+
+    <button class="hub-btn" onclick="location.href='pessoal.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </button>
+
+    <button class="hub-btn" onclick="location.href='casa.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </button>
+
+    <button class="hub-btn" onclick="location.href='profissional.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </button>
+  </div>
+
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+</body>
+</html>

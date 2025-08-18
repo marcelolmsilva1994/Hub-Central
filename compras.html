@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compras</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+  }
+
+  .container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  iframe {
+    width: 100%;
+    max-width: 1000px;
+    height: 80vh;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    background: white;
+  }
+
+  .dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+  }
+
+  .dock-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .dock-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background-color: #111; color: #fff; }
+    header { background: rgba(28,28,30,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .dock { background: rgba(28,28,30,0.7); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+    .dock-btn { color: #fff; }
+    iframe { background: #1c1c1e; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌐 Compras</h1>
+</header>
+
+<div class="container">
+  <!-- Aqui mudas o src para a página que queres carregar -->
+  <iframe src="https://web.getbring.com/app/lists/0"></iframe>
+</div>
+
+<div class="dock">
+  <a href="pessoal.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+      1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+    </svg>
+    Pessoal
+  </a>
+
+  <a href="casa.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+    </svg>
+    Casa
+  </a>
+
+  <a href="profissional.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+    </svg>
+    Profissional
+  </a>
+</div>
+
+</body>
+</html>

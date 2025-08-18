@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poupanças 2025</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<style>
+  /* ===== Reset ===== */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom, #f2f2f7, #ffffff);
+    color: #1c1c1e;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 30px 0 20px;
+    font-size: 2.5rem;
+    font-weight: 600;
+  }
+
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .kpi-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+
+  .kpi-box {
+    border-radius: 25px;
+    padding: 30px 40px;
+    min-width: 220px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.5s, border-top-color 0.5s;
+  }
+
+  .kpi-box h3 {
+    margin: 10px 0 6px;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .kpi-box p {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .kpi-poupanca { border-top: 4px solid; }
+  .kpi-ferias { border-top: 4px solid; }
+
+  .charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .chart-box {
+    border-radius: 25px;
+    padding: 30px;
+    flex: 1 1 400px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.5s;
+  }
+
+  canvas { max-width: 100%; height: 350px; }
+  .dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+  }
+
+  .dock-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .dock-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+  }
+  h2 {
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  /* ===== Light Mode ===== */
+  body.light {
+    background: linear-gradient(145deg, #f7f7f7, #eaeaea);
+    color: #1c1c1e;
+  }
+  body.light h1, body.light h2 { color: #1c1c1e; }
+  body.light .kpi-box {
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  body.light .chart-box {
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  body.light .kpi-poupanca { border-top-color: #30d158; }
+  body.light .kpi-ferias { border-top-color: #0a84ff; }
+
+  /* ===== Dark Mode ===== */
+  body.dark {
+    background: linear-gradient(145deg, #1c1c1e, #2c2c2e);
+    color: #f2f2f7;
+  }
+  body.dark h1, body.dark h2 { color: #f2f2f7; }
+  body.dark .kpi-box {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  }
+  body.dark .chart-box {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  }
+  body.dark .kpi-poupanca { border-top-color: #30d158; }
+  body.dark .kpi-ferias { border-top-color: #0a84ff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Dashboard de Poupanças 2025</h1>
+
+  <div class="kpi-container">
+    <div class="kpi-box kpi-poupanca">
+      <h3>Poupanças</h3>
+      <p id="totalPoupanca">0 €</p>
+    </div>
+    <div class="kpi-box kpi-ferias">
+      <h3>Férias</h3>
+      <p id="totalFerias">0 €</p>
+    </div>
+  </div>
+
+  <div class="charts-container">
+    <div class="chart-box">
+      <h2>Evolução das Poupanças</h2>
+      <canvas id="chartPoupanca"></canvas>
+    </div>
+    <div class="chart-box">
+      <h2>Fundo para Férias</h2>
+      <canvas id="chartFerias"></canvas>
+    </div>
+    <div class="chart-box" style="flex: 1 1 800px;">
+      <h2>Resumo Anual</h2>
+      <canvas id="chartResumo"></canvas>
+    </div>
+  </div>
+</div>
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+
+<script>
+  // ===== Detecta preferencia do sistema =====
+  if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.add('light');
+  }
+
+  const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyBCKIqCRwswkUQP_or3WI1dOG3JyQGyousdaS_6w_lTyRjJSXXnl5PeMW5jq2lQ/pub?output=csv&gid=1444389821';
+
+  fetch(csvUrl)
+    .then(res => res.text())
+    .then(csv => {
+      const linhas = csv.trim().split('\n');
+      const meses = [], fundoML = [], feriasML = [], linhaReferencia = [];
+
+      linhas.slice(1).forEach((linha,i) => {
+        const cols = linha.split(',');
+        meses.push(cols[0]);
+        const fundo = Number(cols[1].replace(/\s|€/g,'') || 0);
+        const ferias = Number(cols[2].replace(/\s|€/g,'') || 0);
+        fundoML.push(fundo);
+        feriasML.push(ferias);
+
+        if(i < 2){
+          linhaReferencia.push(null);
+        } else {
+          linhaReferencia.push(fundoML[i-1] + 200);
+        }
+      });
+
+      document.getElementById('totalPoupanca').textContent = (fundoML[fundoML.length - 1] || 0).toLocaleString('pt-PT') + ' €';
+      document.getElementById('totalFerias').textContent = (feriasML[feriasML.length - 1] || 0).toLocaleString('pt-PT') + ' €';
+
+function createBarChart(ctx, label, data, gradientColors, referenceLine = null) {
+  // Gradiente suave
+  const grad = ctx.createLinearGradient(0, 0, 0, 350);
+  grad.addColorStop(0, gradientColors[0]);
+  grad.addColorStop(1, gradientColors[1]);
+
+  const datasets = [
+    {
+      label,
+      data,
+      backgroundColor: referenceLine
+        ? data.map((v, i) =>
+            referenceLine[i] !== null && v > referenceLine[i]
+              ? grad
+              : "rgba(0,0,0,0.08)"
+          )
+        : grad,
+      borderRadius: 12,
+      borderSkipped: false, // barras com cantos arredondados em cima
+    },
+  ];
+
+  // Linha de referência (média, meta, etc.)
+  if (referenceLine) {
+    datasets.push({
+      label: "Linha de referência",
+      type: "line",
+      data: referenceLine,
+      borderColor: "rgba(48,209,88,0.9)",
+      borderWidth: 2,
+      pointRadius: 0,
+      borderDash: [6, 6],
+      fill: false,
+    });
+  }
+
+  return new Chart(ctx, {
+    type: "bar",
+    data: { labels: meses, datasets },
+    options: {
+      responsive: true,
+      animation: { duration: 1200, easing: "easeOutQuart" },
+      plugins: {
+legend: {
+  position: "top",
+  labels: {
+    usePointStyle: true,
+     pointStyle: "rect", // opcional, "rect" é quadrado
+    color: getComputedStyle(document.body).color,
+    font: { weight: "600" },
+  },
+},
+
+        tooltip: {
+          backgroundColor: getComputedStyle(document.body).backgroundColor,
+          titleColor: getComputedStyle(document.body).color,
+          bodyColor: getComputedStyle(document.body).color,
+          padding: 12,
+          cornerRadius: 10,
+          callbacks: {
+            label: (context) =>
+              context.raw !== null
+                ? context.raw.toLocaleString("pt-PT") + " €"
+                : "",
+          },
+        },
+        datalabels: {
+          anchor: "end",
+          align: "end",
+          color: getComputedStyle(document.body).color,
+          font: { weight: "600" },
+          formatter: (val) =>
+            val > 0 ? val.toLocaleString("pt-PT") + " €" : "",
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: getComputedStyle(document.body).color },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { display: false },
+          ticks: {
+            color: getComputedStyle(document.body).color,
+            callback: (v) => v.toLocaleString("pt-PT") + " €",
+          },
+        },
+      },
+      interaction: { mode: "index", intersect: false },
+    },
+    plugins: [ChartDataLabels],
+  });
+}
+
+
+function createResumoChart(ctx, poupancas, ferias) {
+  return new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          label: "Poupanças",
+          data: poupancas,
+          borderColor: "#30d158",
+          fill: false,
+          tension: 0.25,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        },
+        {
+          label: "Férias",
+          data: ferias,
+          borderColor: "#0a84ff",
+          fill: false,
+          tension: 0.25,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 800, easing: "easeOutQuart" },
+      plugins: {
+        legend: {
+          position: "top",
+          labels: { 
+            usePointStyle: true,
+            pointStyle: "line",
+            color: getComputedStyle(document.body).color,
+            font: { family: "Helvetica, Arial, sans-serif", weight: "600" }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) =>
+              context.raw.toLocaleString("pt-PT") + " €",
+          },
+        },
+        datalabels: {
+          align: "top",
+          anchor: "end",
+          color: "#343434",
+          font: { family: "Helvetica, Arial, sans-serif", size: 12 },
+          offset: -4,
+          formatter: (val) =>
+            val > 0 ? val.toLocaleString("pt-PT") + " €" : "",
+        },
+      },
+      elements: {
+        line: { borderCapStyle: "round" },
+        point: { hoverRadius: 5 },
+      },
+      scales: {
+        y: { display: false },
+        x: { 
+          grid: { display: false }, 
+          ticks: { color: getComputedStyle(document.body).color }
+        },
+      },
+    },
+    plugins: [ChartDataLabels],
+  });
+}
+
+      createBarChart(
+        document.getElementById('chartPoupanca').getContext('2d'),
+        'Poupanças',
+        fundoML,
+        ['rgba(48,209,88,0.85)','rgba(48,209,88,0.4)'],
+        linhaReferencia
+      );
+
+      createBarChart(
+        document.getElementById('chartFerias').getContext('2d'),
+        'Férias',
+        feriasML,
+        ['rgba(10,132,255,0.85)','rgba(10,132,255,0.4)']
+      );
+
+      createResumoChart(
+        document.getElementById('chartResumo').getContext('2d'),
+        fundoML,
+        feriasML
+      );
+
+    })
+    .catch(err => console.error('Erro ao carregar CSV:', err));
+</script>
+</body>
+</html>

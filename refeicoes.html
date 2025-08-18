@@ -15,7 +15,6 @@
     flex-direction: column;
     min-height: 100vh;
   }
-
   header {
     width: 100%;
     padding: 20px;
@@ -24,14 +23,12 @@
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
-
   header h1 {
     margin: 0;
     font-size: 2rem;
     font-weight: 500;
     letter-spacing: -0.5px;
   }
-
   .container {
     flex: 1;
     display: flex;
@@ -40,7 +37,6 @@
     padding: 20px;
     gap: 20px;
   }
-
   .form-container {
     display: flex;
     flex-wrap: wrap;
@@ -54,7 +50,6 @@
     width: 100%;
     max-width: 900px;
   }
-
   .form-container input[type="text"],
   .form-container select {
     flex: 1 1 150px;
@@ -64,13 +59,11 @@
     font-size: 1rem;
     transition: all 0.2s;
   }
-
   .form-container input[type="text"]:focus,
   .form-container select:focus {
     border-color: #3498db;
     outline: none;
   }
-
   .form-container button {
     padding: 12px 20px;
     border-radius: 15px;
@@ -81,11 +74,9 @@
     cursor: pointer;
     transition: all 0.3s ease;
   }
-
   .form-container button:hover {
     background: #2980b9;
   }
-
   table {
     width: 100%;
     max-width: 900px;
@@ -95,21 +86,17 @@
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   }
-
   th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #e1e1e1;
   }
-
   th {
     background: rgba(0,0,0,0.05);
   }
-
   tr:nth-child(even) {
     background: rgba(0,0,0,0.03);
   }
-
   .delete-btn {
     background: #e74c3c;
     border-radius: 12px;
@@ -119,25 +106,19 @@
     border: none;
     transition: all 0.2s;
   }
-
   .delete-btn:hover {
     background: #c0392b;
   }
-
   .done {
     text-decoration: line-through;
     color: gray;
   }
-
-  /* Cores por responsável */
   .person-lenia {
-    background: #ffe6f0; /* rosa claro */
+    background: #ffe6f0; 
   }
-
   .person-marcelo {
-    background: #e6f0ff; /* azul claro */
+    background: #e6f0ff; 
   }
-
   .dock {
     display: flex;
     justify-content: space-around;
@@ -151,7 +132,6 @@
     position: sticky;
     bottom: 0;
   }
-
   .dock-btn {
     display: flex;
     flex-direction: column;
@@ -162,17 +142,14 @@
     gap: 4px;
     transition: transform 0.2s;
   }
-
   .dock-btn:hover {
     transform: translateY(-3px);
   }
-
   .dock-btn svg {
     width: 28px;
     height: 28px;
     stroke-width: 2;
   }
-
   @media (prefers-color-scheme: dark) {
     body { background-color: #111; color: #fff; }
     header { background: rgba(28,28,30,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -182,19 +159,15 @@
     .dock-btn, .form-container button { color: #fff; }
     .delete-btn { background: #e74c3c; }
   }
-
   @media (max-width: 650px) {
     .form-container { flex-direction: column; }
     th, td { padding: 10px; font-size: 0.9rem; }
   }
-
-  /* CSS para impressão */
   @media print {
     body * { visibility: hidden; }
     #meal-table, #meal-table * { visibility: visible; }
     #meal-table { position: absolute; left: 0; top: 0; width: 100%; }
   }
-
 </style>
 </head>
 <body>
@@ -227,7 +200,7 @@
       <option value="Marcelo">Marcelo</option>
     </select>
     <button onclick="addMeal()">➕ Adicionar</button>
-    <button id="exportPDF">📄 Exportar Tabela PDF</button>
+    <button onclick="exportPDF()">📄 Exportar Tabela PDF</button>
   </div>
 
   <table id="meal-table">
@@ -240,8 +213,7 @@
         <th>Ações</th>
       </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
   </table>
 
 </div>
@@ -269,75 +241,77 @@
 </div>
 
 <script>
-  const mealInput = document.getElementById('meal-input');
-  const daySelect = document.getElementById('day-select');
-  const typeSelect = document.getElementById('type-select');
-  const personSelect = document.getElementById('person-select');
-  const mealTableBody = document.querySelector('#meal-table tbody');
+const mealInput = document.getElementById('meal-input');
+const daySelect = document.getElementById('day-select');
+const typeSelect = document.getElementById('type-select');
+const personSelect = document.getElementById('person-select');
+const mealTableBody = document.querySelector('#meal-table tbody');
 
-  let meals = JSON.parse(localStorage.getItem('meals') || '[]');
+let meals = JSON.parse(localStorage.getItem('meals') || '[]');
 
-  function saveMeals() {
-    localStorage.setItem('meals', JSON.stringify(meals));
-  }
+meals = meals.filter(m => m && m.name && m.person);
 
-  function renderMeals() {
-    mealTableBody.innerHTML = '';
-    meals.forEach((meal, index) => {
-      const row = document.createElement('tr');
-      const personClass = meal.person.toLowerCase() === "lénia" ? "person-lenia" : "person-marcelo";
-      row.classList.add(personClass);
-      row.innerHTML = `
-        <td>${meal.day}</td>
-        <td>${meal.type}</td>
-        <td class="${meal.done ? 'done' : ''}">
-          <input type="checkbox" ${meal.done ? 'checked' : ''} onchange="toggleDone(${index}, this.checked)">
-          ${meal.name}
-        </td>
-        <td>${meal.person}</td>
-        <td>
-          <button class="delete-btn" onclick="deleteMeal(${index})">🗑 Apagar</button>
-        </td>
-      `;
-      mealTableBody.appendChild(row);
-    });
-  }
+function saveMeals() {
+  localStorage.setItem('meals', JSON.stringify(meals));
+}
 
-  function addMeal() {
-    const newMeal = {
-      name: mealInput.value.trim(),
-      day: daySelect.value,
-      type: typeSelect.value,
-      person: personSelect.value,
-      done: false
-    };
-    if(newMeal.name === '') return;
-    meals.push(newMeal);
-    saveMeals();
-    renderMeals();
-    mealInput.value = '';
-  }
-
-  function deleteMeal(index) {
-    meals.splice(index, 1);
-    saveMeals();
-    renderMeals();
-  }
-
-  function toggleDone(index, checked) {
-    meals[index].done = checked;
-    saveMeals();
-    renderMeals();
-  }
-
-  renderMeals();
-
-  // Exportar PDF com print
-  document.getElementById('exportPDF').addEventListener('click', () => {
-    window.print();
+function renderMeals() {
+  mealTableBody.innerHTML = '';
+  meals.forEach((meal, index) => {
+    const personClass = (meal.person || "").toLowerCase() === "lénia" ? "person-lenia" : "person-marcelo";
+    const row = document.createElement('tr');
+    row.classList.add(personClass);
+    row.innerHTML = `
+      <td>${meal.day}</td>
+      <td>${meal.type}</td>
+      <td>
+        <input type="checkbox" ${meal.done ? 'checked' : ''} onchange="toggleDone(${index}, this.checked)">
+        <span class="${meal.done ? 'done' : ''}">${meal.name}</span>
+      </td>
+      <td>${meal.person}</td>
+      <td>
+        <button class="delete-btn" onclick="deleteMeal(${index})">🗑 Apagar</button>
+      </td>
+    `;
+    mealTableBody.appendChild(row);
   });
+}
+
+function addMeal() {
+  const newMeal = {
+    name: mealInput.value.trim(),
+    day: daySelect.value,
+    type: typeSelect.value,
+    person: personSelect.value || "Lénia",
+    done: false
+  };
+  if(newMeal.name === '') return;
+  meals.push(newMeal);
+  saveMeals();
+  renderMeals();
+  mealInput.value = '';
+}
+
+function deleteMeal(index) {
+  meals.splice(index, 1);
+  saveMeals();
+  renderMeals();
+}
+
+function toggleDone(index, checked) {
+  meals[index].done = checked;
+  saveMeals();
+  renderMeals();
+}
+
+function exportPDF() {
+  window.print();
+}
+
+renderMeals();
 </script>
 
 </body>
 </html>
+
 

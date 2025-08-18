@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadro de Tarefas Semanais</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+}
+
+.form-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 900px;
+}
+
+.form-container input[type="text"] {
+    flex: 1 1 150px;
+    padding: 12px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.form-container input[type="text"]:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.form-container button {
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: none;
+    background: #3498db;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-container button:hover {
+    background: #2980b9;
+}
+
+.board {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    gap: 10px;
+}
+
+.day {
+    width: 13%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    min-height: 200px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.day h3 { text-align: center; margin-top: 0; }
+
+#tasks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.task {
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: grab;
+    background: #fff;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    border: 1px solid #000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.task:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+.task.dragging { opacity: 0.5; }
+
+#newTaskContainer {
+    margin-top: 20px;
+}
+
+.dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    bottom: 0;
+}
+
+.dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+}
+
+.dock-btn:hover {
+    transform: translateY(-3px);
+}
+
+.dock-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+}
+
+@media print {
+    /* Esconder tudo */
+    body * { visibility: hidden; }
+
+    /* Mostrar apenas a tabela (as divs .day) */
+    .board, .board * { visibility: visible; }
+
+    /* Posicionar a tabela no topo da página */
+    .board { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+    }
+
+    /* Esconder inputs, botões e outras seções */
+    #tasks, #newTaskContainer, .form-container, .dock, header, h2 { display: none; }
+
+    /* Ajustes de impressão */
+    body { margin: 0; font-size: 12pt; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🧹 Tarefas Domésticas</h1>
+</header>
+<div class="container">
+    <div class="form-container">
+        <input type="text" id="newTaskText" placeholder="Nova tarefa">
+        <button id="addTaskBtn">➕ Adicionar</button>
+        <button id="clearAllBtn">🧹 Limpar Tudo</button>
+        <button id="exportPDF">📄 Exportar PDF</button>
+    </div>
+</div>
+
+<div class="board">
+    <div class="day" id="monday"><h3>Segunda</h3></div>
+    <div class="day" id="tuesday"><h3>Terça</h3></div>
+    <div class="day" id="wednesday"><h3>Quarta</h3></div>
+    <div class="day" id="thursday"><h3>Quinta</h3></div>
+    <div class="day" id="friday"><h3>Sexta</h3></div>
+    <div class="day" id="saturday"><h3>Sábado</h3></div>
+    <div class="day" id="sunday"><h3>Domingo</h3></div>
+</div>
+
+<h2>Tarefas Pré-definidas</h2>
+<div id="tasks">
+    <div class="task" draggable="true">Limpar o pó</div>
+    <div class="task" draggable="true">Aspirar</div>
+    <div class="task" draggable="true">Loiças do wc</div>
+    <div class="task" draggable="true">Dobrar a roupa</div>
+    <div class="task" draggable="true">Passar esfregona</div>
+    <div class="task" draggable="true">Lavar Roupa</div>
+    <div class="task" draggable="true">Roupa secar</div>
+    <div class="task" draggable="true">Supermercado</div>
+    <div class="task" draggable="true">Varrer chão cozinha</div>
+    <div class="task" draggable="true">Lavar microondas</div>
+    <div class="task" draggable="true">Lavar máquina de café</div>
+    <div class="task" draggable="true">Ir ao lixo</div>
+</div>
+
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+
+<script>
+const days = document.querySelectorAll('.day');
+const tasksContainer = document.getElementById('tasks');
+const newTaskText = document.getElementById('newTaskText');
+const addTaskBtn = document.getElementById('addTaskBtn');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const exportPDFBtn = document.getElementById('exportPDF');
+
+// Função para criar tarefa
+function createTask(text, color = '') {
+    const task = document.createElement('div');
+    task.innerText = text;
+    task.className = 'task';
+    task.setAttribute('draggable', 'true');
+    task.style.backgroundColor = color;
+
+    // Alternar cor ao clicar
+    task.addEventListener('click', () => {
+        task.style.backgroundColor = task.style.backgroundColor === 'rgb(242, 132, 130)' ? '#4ecdc4' : '#f28482';
+        saveBoard();
+    });
+
+    // Drag & Drop
+    task.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', text);
+    });
+
+    return task;
+}
+
+// Adicionar eventos drag para tarefas existentes
+tasksContainer.querySelectorAll('.task').forEach(task => {
+    task.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', task.innerText);
+    });
+});
+
+// Drag & drop nos dias
+days.forEach(day => {
+    day.addEventListener('dragover', e => e.preventDefault());
+    day.addEventListener('drop', e => {
+        const text = e.dataTransfer.getData('text/plain');
+        const newTask = createTask(text);
+        day.appendChild(newTask);
+        saveBoard();
+    });
+});
+
+// Adicionar nova tarefa
+addTaskBtn.addEventListener('click', () => {
+    const text = newTaskText.value.trim();
+    if (text) {
+        const newTask = createTask(text);
+        tasksContainer.appendChild(newTask);
+        newTaskText.value = '';
+        saveBoard();
+    }
+});
+
+// Limpar todas as tarefas dos dias
+clearAllBtn.addEventListener('click', () => {
+    days.forEach(day => {
+        const title = day.querySelector('h3').innerText;
+        day.innerHTML = `<h3>${title}</h3>`;
+    });
+    saveBoard();
+});
+
+// Exportar PDF
+exportPDFBtn.addEventListener('click', () => {
+    window.print();
+});
+
+// Salvar board no localStorage
+function saveBoard() {
+    const board = {};
+    days.forEach(day => {
+        board[day.id] = [];
+        day.querySelectorAll('.task').forEach(task => {
+            board[day.id].push({
+                text: task.innerText,
+                color: task.style.backgroundColor || ''
+            });
+        });
+    });
+    localStorage.setItem('weeklyBoard', JSON.stringify(board));
+}
+
+// Carregar board do localStorage
+function loadBoard() {
+    const board = JSON.parse(localStorage.getItem('weeklyBoard'));
+    if (!board) return;
+    days.forEach(day => {
+        const tasks = board[day.id] || [];
+        tasks.forEach(t => {
+            const task = createTask(t.text, t.color);
+            day.appendChild(task);
+        });
+    });
+}
+
+loadBoard();
+</script>
+
+</body>
+</html>

@@ -207,11 +207,21 @@ new Chart(document.getElementById('chartSoma').getContext('2d'), {
     ...commonOptions,
     plugins: {
       ...commonOptions.plugins,
+      legend: {
+        display: true,
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'line',  // mostra linha na legenda
+          boxWidth: 40,        // comprimento da linha
+          color: '#343434',
+          font: { family: 'Helvetica, Arial, sans-serif', size: 12 }
+        }
+      },
       datalabels: {
         display: true,
         color: '#343434',
         font: { 
-          family: 'Helvetica, Arial, sans-serif', // fonte clean
+          family: 'Helvetica, Arial, sans-serif',
           weight: 'normal', 
           size: 12 
         },
@@ -230,7 +240,8 @@ new Chart(document.getElementById('chartSoma').getContext('2d'), {
 });
 
 
-    // Evolução por Categoria
+
+   // Evolução por Categoria
 new Chart(document.getElementById('chartLinhaCategoria').getContext('2d'), {
   type: 'line',
   data: {
@@ -278,12 +289,21 @@ new Chart(document.getElementById('chartLinhaCategoria').getContext('2d'), {
     ...commonOptions,
     plugins: {
       ...commonOptions.plugins,
+      legend: {
+        display: true,
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'line',   // linha na legenda
+          boxWidth: 40,         // comprimento da linha
+          color: '#343434',
+          font: { family: 'Helvetica, Arial, sans-serif', size: 12 }
+        }
+      },
       datalabels: {
-    display: function(context) {
-      // Não mostrar rótulos do dataset 'Net'
-      if (context.dataset.label === 'Net') return false;
-
-    },
+        display: function(context) {
+          // Não mostrar rótulos do dataset 'Net'
+          return context.dataset.label !== 'Net';
+        },
         color: '#343434',
         font: { family: 'Helvetica, Arial, sans-serif', size: 12 },
         anchor: 'end',
@@ -301,6 +321,7 @@ new Chart(document.getElementById('chartLinhaCategoria').getContext('2d'), {
   },
   plugins: [ChartDataLabels]
 });
+
 
 
 

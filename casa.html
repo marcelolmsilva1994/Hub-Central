@@ -21,7 +21,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       gap: 20px;
       padding: 20px;
     }
@@ -30,52 +30,45 @@
       font-weight: 500;
       font-size: 2rem;
       color: #111;
-      margin-bottom: 10px;
+      margin-bottom: 30px;
       letter-spacing: -0.5px;
     }
 
-    .apps-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+    .hub-btn {
       width: 100%;
       max-width: 400px;
-    }
-
-    .app-btn {
+      padding: 18px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 25px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.85);
+      color: #111;
+      border: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 20px;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      color: #fff;
-      text-decoration: none;
-      width: 100%;
-      max-width: 160px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      gap: 12px;
     }
 
-    .app-btn svg {
-      width: 40px;
-      height: 40px;
-      margin-bottom: 8px;
+    .hub-btn:hover {
+      background: rgba(255,255,255,0.95);
+      transform: scale(1.03);
+    }
+
+    .hub-btn:active {
+      transform: scale(0.97);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .hub-btn svg {
+      width: 24px;
+      height: 24px;
       stroke-width: 2;
     }
-
-    .app-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-
-    /* Cores diferentes e sombra colorida */
-    .app-refeicoes { background: #ff6b6b; box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5); }  
-    .app-tarefas { background: #4ecdc4; box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5); }    
-    .app-poupancas { background: #f7b733; box-shadow: 0 6px 20px rgba(247, 183, 51, 0.5); }  
-    .app-despesas { background: #1a535c; box-shadow: 0 6px 20px rgba(26, 83, 92, 0.5); }    
 
     .dock {
       display: flex;
@@ -107,64 +100,82 @@
     }
 
     .dock-btn svg {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       stroke-width: 2;
     }
 
     @media (prefers-color-scheme: dark) {
-      body { background-color: #111; color: #fff; }
-      .dock { background: rgba(28,28,30,0.7); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
-      .dock-btn { color: #fff; }
-      .app-btn svg, .dock-btn svg { stroke: #fff; }
+      body {
+        background-color: #111;
+        color: #fff;
+      }
+      .hub-btn {
+        background: rgba(28,28,30,0.85);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      }
+      .hub-btn:hover {
+        background: rgba(28,28,30,0.95);
+      }
+      .hub-btn svg, .dock-btn svg {
+        stroke: #fff;
+      }
+      .dock {
+        background: rgba(28,28,30,0.7);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+      }
+      .dock-btn {
+        color: #fff;
+      }
     }
 
     @media (max-width: 600px) {
-      .hub-container { padding: 10px; }
-      .apps-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .hub-container {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="hub-container">
-    <h1>Casa</h1>
+  <h1>Casa</h1>
 
-    <div class="apps-grid">
-      <a href="refeicoes.html" class="app-btn app-refeicoes">
-        <!-- Garfo e faca -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M11 2v20M15 2v20M7 6h10"/>
-        </svg>
-        Refeições
-      </a>
+  <button class="hub-btn" onclick="location.href='tarefas.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>
+    Tarefas
+  </button>
 
-      <a href="tarefas.html" class="app-btn app-tarefas">
-        <!-- Checklist -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M5 7h14M5 17h14"/>
-        </svg>
-        Tarefas
-      </a>
+  <button class="hub-btn" onclick="location.href='refeicoes.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 2v20M15 2v20M4 9h16M4 15h16"/>
+    </svg>
+    Refeições
+  </button>
 
-      <a href="poupancas.html" class="app-btn app-poupancas">
-        <!-- Cofrinho -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c3 0 5-2 5-5s-2-5-5-5-5 2-5 5 2 5 5 5zM12 12v7M9 19h6"/>
-        </svg>
-        Poupanças
-      </a>
+  <button class="hub-btn" onclick="location.href='compras.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M7 6v12a1 1 0 001 1h8a1 1 0 001-1V6"/>
+    </svg>
+    Compras
+  </button>
 
-      <a href="despesas.html" class="app-btn app-despesas">
-        <!-- Moedas -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <circle cx="12" cy="12" r="6"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8M8 12h8"/>
-        </svg>
-        Despesas
-      </a>
-    </div>
-  </div>
+  <button class="hub-btn" onclick="location.href='poupancas.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8M8 12h8"/>
+    </svg>
+    Poupanças
+  </button>
 
+  <button class="hub-btn" onclick="location.href='despesas.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/>
+    </svg>
+    Despesas
+  </button>
+</div>
   <div class="dock">
     <a href="pessoal.html" class="dock-btn">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,3 +201,4 @@
   </div>
 </body>
 </html>
+

@@ -305,6 +305,8 @@ new Chart(document.getElementById('chartLinhaCategoria').getContext('2d'), {
 
 
     // Média Anual (Doughnut)
+    
+    const mediaSoma = (soma.reduce((a,b)=>a+b,0)/soma.length).toFixed(2);
 new Chart(document.getElementById('chartResumo').getContext('2d'), {
   type: 'doughnut',
   data: {
@@ -332,31 +334,45 @@ new Chart(document.getElementById('chartResumo').getContext('2d'), {
         align: 'center',
         labels: {
           color: '#1c1c1e',
-          boxWidth: 18,       // tamanho do quadrado colorido
+          boxWidth: 18,
           boxHeight: 18,
-          padding: 15,        // espaçamento entre itens
-          font: {
-            family: 'Helvetica, Arial, sans-serif',
-            size: 13,
-            weight: '500'
-          }
+          padding: 15,
+          font: { family: 'Helvetica, Arial, sans-serif', size: 13, weight: '500' }
         }
       },
       datalabels: {
         color: '#1c1c1e',
         font: { family: 'Helvetica, Arial, sans-serif', size: 12, weight: '500' },
         formatter: (val, ctx) => {
-          const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-          const pct = ((val / total) * 100).toFixed(1);
-          return `${val.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €\n(${pct}%)`;
+          const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+          const pct = ((val/total)*100).toFixed(1);
+          return `${val.toLocaleString('pt-PT', { minimumFractionDigits:2, maximumFractionDigits:2 })} €\n(${pct}%)`;
         },
         anchor: 'center',
         align: 'center'
       }
     }
   },
-  plugins: [ChartDataLabels]
+  plugins: [
+    ChartDataLabels,
+    {
+      // Plugin customizado para texto central
+      id: 'centerText',
+      afterDraw: (chart) => {
+        const { ctx, chartArea: { width, height } } = chart;
+        ctx.save();
+        ctx.font = 'bold 20px Helvetica';
+        ctx.fillStyle = '#1c1c1e';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const totalAvg = ((media(agua) + media(luz) + media(portagens) + media(net))).toLocaleString('pt-PT', { minimumFractionDigits:2, maximumFractionDigits:2 });
+ctx.fillText(` ${parseFloat(mediaSoma).toLocaleString('pt-PT')} €`, width/2, height/2);
+        ctx.restore();
+      }
+    }
+  ]
 });
+
 
     // Fade-in
     document.querySelectorAll('.chart-box').forEach((b,i)=>setTimeout(()=>b.classList.add('show'), i*200));
@@ -366,3 +382,4 @@ new Chart(document.getElementById('chartResumo').getContext('2d'), {
 </script>
 </body>
 </html>
+

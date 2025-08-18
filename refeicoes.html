@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planeamento Refeições</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+  }
+
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .form-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .form-container input[type="text"],
+  .form-container select {
+    flex: 1 1 150px;
+    padding: 12px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-container input[type="text"]:focus,
+  .form-container select:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+
+  .form-container button {
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: none;
+    background: #3498db;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .form-container button:hover {
+    background: #2980b9;
+  }
+
+  table {
+    width: 100%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.85);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  th {
+    background: rgba(0,0,0,0.05);
+  }
+
+  tr:nth-child(even) {
+    background: rgba(0,0,0,0.03);
+  }
+
+  .delete-btn {
+    background: #e74c3c;
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .delete-btn:hover {
+    background: #c0392b;
+  }
+
+  .done {
+    text-decoration: line-through;
+    color: gray;
+  }
+
+  /* Cores por responsável */
+  .person-lenia {
+    background: #ffe6f0; /* rosa claro */
+  }
+
+  .person-marcelo {
+    background: #e6f0ff; /* azul claro */
+  }
+
+  .dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+  }
+
+  .dock-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .dock-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background-color: #111; color: #fff; }
+    header { background: rgba(28,28,30,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .form-container, table { background: rgba(28,28,30,0.85); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    th { background: rgba(255,255,255,0.05); }
+    .dock { background: rgba(28,28,30,0.7); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+    .dock-btn, .form-container button { color: #fff; }
+    .delete-btn { background: #e74c3c; }
+  }
+
+  @media (max-width: 650px) {
+    .form-container { flex-direction: column; }
+    th, td { padding: 10px; font-size: 0.9rem; }
+  }
+
+  /* CSS para impressão */
+  @media print {
+    body * { visibility: hidden; }
+    #meal-table, #meal-table * { visibility: visible; }
+    #meal-table { position: absolute; left: 0; top: 0; width: 100%; }
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍴 Planeamento Refeições</h1>
+</header>
+
+<div class="container">
+
+  <div class="form-container">
+    <input type="text" id="meal-input" placeholder="Nova refeição">
+    <select id="day-select">
+      <option value="Segunda">Segunda</option>
+      <option value="Terça">Terça</option>
+      <option value="Quarta">Quarta</option>
+      <option value="Quinta">Quinta</option>
+      <option value="Sexta">Sexta</option>
+      <option value="Sábado">Sábado</option>
+      <option value="Domingo">Domingo</option>
+    </select>
+    <select id="type-select">
+      <option value="Pequeno-almoço">Pequeno-almoço</option>
+      <option value="Lanche">Lanche</option>
+      <option value="Almoço">Almoço</option>
+      <option value="Jantar">Jantar</option>
+    </select>
+    <select id="person-select">
+      <option value="Lénia">Lénia</option>
+      <option value="Marcelo">Marcelo</option>
+    </select>
+    <button onclick="addMeal()">➕ Adicionar</button>
+    <button id="exportPDF">📄 Exportar Tabela PDF</button>
+  </div>
+
+  <table id="meal-table">
+    <thead>
+      <tr>
+        <th>Dia</th>
+        <th>Tipo</th>
+        <th>Refeição</th>
+        <th>Responsável</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+</div>
+
+<div class="dock">
+  <a href="pessoal.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+      1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+    </svg>
+    Pessoal
+  </a>
+  <a href="casa.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+    </svg>
+    Casa
+  </a>
+  <a href="profissional.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+    </svg>
+    Profissional
+  </a>
+</div>
+
+<script>
+  const mealInput = document.getElementById('meal-input');
+  const daySelect = document.getElementById('day-select');
+  const typeSelect = document.getElementById('type-select');
+  const personSelect = document.getElementById('person-select');
+  const mealTableBody = document.querySelector('#meal-table tbody');
+
+  let meals = JSON.parse(localStorage.getItem('meals') || '[]');
+
+  function saveMeals() {
+    localStorage.setItem('meals', JSON.stringify(meals));
+  }
+
+  function renderMeals() {
+    mealTableBody.innerHTML = '';
+    meals.forEach((meal, index) => {
+      const row = document.createElement('tr');
+      const personClass = meal.person.toLowerCase() === "lénia" ? "person-lenia" : "person-marcelo";
+      row.classList.add(personClass);
+      row.innerHTML = `
+        <td>${meal.day}</td>
+        <td>${meal.type}</td>
+        <td class="${meal.done ? 'done' : ''}">
+          <input type="checkbox" ${meal.done ? 'checked' : ''} onchange="toggleDone(${index}, this.checked)">
+          ${meal.name}
+        </td>
+        <td>${meal.person}</td>
+        <td>
+          <button class="delete-btn" onclick="deleteMeal(${index})">🗑 Apagar</button>
+        </td>
+      `;
+      mealTableBody.appendChild(row);
+    });
+  }
+
+  function addMeal() {
+    const newMeal = {
+      name: mealInput.value.trim(),
+      day: daySelect.value,
+      type: typeSelect.value,
+      person: personSelect.value,
+      done: false
+    };
+    if(newMeal.name === '') return;
+    meals.push(newMeal);
+    saveMeals();
+    renderMeals();
+    mealInput.value = '';
+  }
+
+  function deleteMeal(index) {
+    meals.splice(index, 1);
+    saveMeals();
+    renderMeals();
+  }
+
+  function toggleDone(index, checked) {
+    meals[index].done = checked;
+    saveMeals();
+    renderMeals();
+  }
+
+  renderMeals();
+
+  // Exportar PDF com print
+  document.getElementById('exportPDF').addEventListener('click', () => {
+    window.print();
+  });
+</script>
+
+</body>
+</html>

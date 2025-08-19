@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registo de Despesas</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+  .form-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 900px;
+  }
+  .form-container input[type="text"],
+  .form-container input[type="number"],
+  .form-container input[type="date"],
+  .form-container select {
+    flex: 1 1 150px;
+    padding: 12px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .form-container input:focus,
+  .form-container select:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+  .form-container button {
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: none;
+    background: #3498db;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .form-container button:hover {
+    background: #2980b9;
+  }
+  table {
+    width: 100%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.85);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  th {
+    background: rgba(0,0,0,0.05);
+  }
+  tr:nth-child(even) {
+    background: rgba(0,0,0,0.03);
+  }
+  .delete-btn {
+    background: #e74c3c;
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .delete-btn:hover {
+    background: #c0392b;
+  }
+  .done {
+    text-decoration: line-through;
+    color: gray;
+  }
+  .dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+  }
+
+  .dock-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .dock-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+  }
+  
+    @media (prefers-color-scheme: dark) {
+    body { background-color: #111; color: #fff; }
+    header { background: rgba(28,28,30,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .form-container, table { background: rgba(28,28,30,0.85); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    th { background: rgba(255,255,255,0.05); }
+    .dock { background: rgba(28,28,30,0.7); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+    .dock-btn, .form-container button { color: #fff; }
+    .delete-btn { background: #e74c3c; }
+  }
+
+  @media (max-width: 650px) {
+    .form-container { flex-direction: column; }
+    th, td { padding: 10px; font-size: 0.9rem; }
+  }
+
+  /* CSS para impressão */
+/* CSS para impressão */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #expense-table, #expense-table * {
+    visibility: visible;
+  }
+  #expense-table {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="form-container">
+    <input type="date" id="date-input">
+    <input type="text" id="expense-input" placeholder="Descrição da despesa">
+    <input type="number" id="value-input" placeholder="Valor (€)" step="0.01" min="0">
+    <select id="type-select">
+      <option value="Alimentação">Alimentação</option>
+      <option value="Transporte">Transporte</option>
+      <option value="Casa">Casa</option>
+      <option value="Lazer">Lazer</option>
+      <option value="Desporto">Desporto</option>
+      <option value="Saúde">Saúde</option>
+      <option value="Compras pessoais">Compras pessoais</option>
+      <option value="Investimento">Investimento</option>
+      <option value="Poupanças">Poupanças</option>
+      <option value="Comunicações">Comunicações</option>
+      <option value="Reparações diversas">Reparações diversas</option>
+      <option value="Viagens e férias">Viagens e férias</option>
+      <option value="Entretenimento">Entretenimento</option>
+      <option value="Outro">Outro</option>
+    </select>
+    <button onclick="addExpense()">➕ Adicionar</button>
+    <button id="exportPDF">📄 Exportar PDF</button>
+    <button id="exportXLS">📊 Exportar XLS</button>
+    <button onclick="clearAllExpenses()">🧹 Limpar Tudo</button>
+  </div>
+
+  <table id="expense-table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Categoria</th>
+        <th>Descrição</th>
+        <th>Valor (€)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3">Total</td>
+        <td id="total-value">0.00 €</td>
+      </tr>
+    </tfoot>
+  </table>
+
+</div>
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+<script>
+  const dateInput = document.getElementById('date-input');
+  const expenseInput = document.getElementById('expense-input');
+  const valueInput = document.getElementById('value-input');
+  const typeSelect = document.getElementById('type-select');
+  const expenseTableBody = document.querySelector('#expense-table tbody');
+  const totalValueEl = document.getElementById('total-value');
+
+  let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+
+  function saveExpenses() {
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  }
+
+  function formatDate(isoDate) {
+    if (!isoDate) return "";
+    const [year, month, day] = isoDate.split("-");
+    return `${day}/${month}/${year}`;
+  }
+
+  function renderExpenses() {
+    expenseTableBody.innerHTML = '';
+    let total = 0;
+    expenses.forEach((expense, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${formatDate(expense.date)}</td>
+        <td>${expense.type}</td>
+        <td class="${expense.done ? 'done' : ''}">
+          <input type="checkbox" ${expense.done ? 'checked' : ''} onchange="toggleDone(${index}, this.checked)">
+          ${expense.name}
+        </td>
+        <td>${expense.value.toFixed(2)} €</td>
+      `;
+      expenseTableBody.appendChild(row);
+      if (!expense.done) total += expense.value;
+    });
+    totalValueEl.textContent = total.toFixed(2) + ' €';
+  }
+
+  function addExpense() {
+    const newExpense = {
+      date: dateInput.value,
+      name: expenseInput.value.trim(),
+      value: parseFloat(valueInput.value) || 0,
+      type: typeSelect.value,
+      done: false
+    };
+    if(newExpense.name === '' || newExpense.value <= 0 || newExpense.date === '') return;
+    expenses.push(newExpense);
+    saveExpenses();
+    renderExpenses();
+    dateInput.value = '';
+    expenseInput.value = '';
+    valueInput.value = '';
+  }
+
+  function toggleDone(index, checked) {
+    expenses[index].done = checked;
+    saveExpenses();
+    renderExpenses();
+  }
+
+  function clearAllExpenses() {
+    expenses = [];
+    saveExpenses();
+    renderExpenses();
+  }
+
+  renderExpenses();
+
+  // Exportar PDF
+  document.getElementById('exportPDF').addEventListener('click', () => {
+    window.print();
+  });
+
+  // Exportar XLS
+  document.getElementById('exportXLS').addEventListener('click', () => {
+    const ws_data = [
+      ["Data", "Categoria", "Descrição", "Valor (€)"],
+      ...expenses.map(e => [formatDate(e.date), e.type, e.name, e.value.toFixed(2) + " €"]),
+      ["", "", "Total", totalValueEl.textContent]
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Despesas");
+    XLSX.writeFile(wb, "despesas.xlsx");
+  });
+</script>
+
+</body>
+</html>

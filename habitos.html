@@ -46,6 +46,7 @@ tr:nth-child(even) { background:rgba(0,0,0,0.03); }
 
     <label><input type="checkbox" id="agua"> Beber 2L Água</label>
     <label><input type="checkbox" id="sono"> Dormir 7–8h/noite</label>
+    <label><input type="checkbox" id="pele"> Skin Care </label>
     <label><input type="checkbox" id="ginasio"> Ir ao Ginásio</label>
     <label><input type="checkbox" id="caminhar"> Caminhar 10.000 passos</label>
     <label><input type="checkbox" id="ler"> Ler 15 minutos</label>
@@ -66,6 +67,7 @@ tr:nth-child(even) { background:rgba(0,0,0,0.03); }
       <tr>
         <th>Data</th>
         <th>2L Água</th>
+        <th>Skin Care</th>
         <th>7–8h Sono</th>
         <th>Ginásio</th>
         <th>10.000 Passos</th>
@@ -118,6 +120,7 @@ function saveLog() {
   const checks = [
     document.getElementById('agua').checked,
     document.getElementById('sono').checked,
+    document.getElementById('pele').checked,
     document.getElementById('ginasio').checked,
     document.getElementById('caminhar').checked,
     document.getElementById('ler').checked,
@@ -216,3 +219,5 @@ renderChart();
 </script>
 </body>
 </html>
+
+

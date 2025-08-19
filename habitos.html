@@ -8,6 +8,7 @@
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+
 body { margin:0; font-family:'Poppins',sans-serif; background:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
 .container { flex:1; display:flex; flex-direction:column; align-items:center; padding:20px; gap:20px; }
 .form-container { display:flex; flex-direction:column; gap:15px; padding:20px; background:rgba(255,255,255,0.85); border-radius:20px; box-shadow:0 8px 25px rgba(0,0,0,0.1); width:100%; max-width:700px; }
@@ -40,7 +41,6 @@ tr:nth-child(even) { background:rgba(0,0,0,0.03); }
 </head>
 <body>
 <div class="container">
-
   <div class="form-container">
     <input type="date" id="log-date">
 
@@ -73,10 +73,10 @@ tr:nth-child(even) { background:rgba(0,0,0,0.03); }
         <th>10.000 Passos</th>
         <th>Ler 15m</th>
         <th>Alimentação</th>
-        <th>2 cafés</th>
-        <th>Total</th>        
+        <th>2 cafés</th>  
         <th>Planear</th>
         <th>Rever</th>
+        <th>Total</th>
       </tr>
     </thead>
     <tbody id="log-tbody"></tbody>
@@ -219,5 +219,3 @@ renderChart();
 </script>
 </body>
 </html>
-
-

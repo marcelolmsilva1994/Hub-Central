@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objetivos Mensais</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
+.container { flex:1; display:flex; flex-direction:column; align-items:center; padding:20px; gap:20px; }
+.form-container { display:flex; flex-direction:column; gap:15px; padding:20px; background:rgba(255,255,255,0.85); border-radius:20px; box-shadow:0 8px 25px rgba(0,0,0,0.1); width:100%; max-width:700px; }
+.form-container label { display:flex; align-items:center; gap:10px; }
+.form-container input[type="date"] { padding:8px; border-radius:10px; border:1px solid #ccc; flex:1; }
+.form-container button { padding:12px 20px; border-radius:15px; border:none; background:#3498db; color:white; font-weight:500; cursor:pointer; transition:all 0.3s; }
+.form-container button:hover { background:#2980b9; }
+table { width:100%; max-width:900px; border-collapse:collapse; background:rgba(255,255,255,0.85); border-radius:15px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.08); font-size:0.9rem; }
+th, td { padding:8px; text-align:center; border-bottom:1px solid #e1e1e1; }
+th { background:rgba(0,0,0,0.05); }
+tr:nth-child(even) { background:rgba(0,0,0,0.03); }
+.buttons-container { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.buttons-container button { flex:1; max-width:150px; background:#3498db; color:white; border-radius:12px; border:none; padding:10px; cursor:pointer; font-weight:500; transition:all 0.2s; }
+.buttons-container button:hover { background:#2980b9; }
+.buttons-container button.red { background:#e74c3c; }
+.buttons-container button.red:hover { background:#c0392b; }
+.dock { display:flex; justify-content:space-around; align-items:center; padding:12px 0; background:rgba(255,255,255,0.7); backdrop-filter:blur(15px); border-top-left-radius:25px; border-top-right-radius:25px; box-shadow:0 -4px 20px rgba(0,0,0,0.08); position:sticky; bottom:0; }
+.dock-btn { display:flex; flex-direction:column; align-items:center; font-size:0.75rem; color:#111; text-decoration:none; gap:4px; transition:transform 0.2s; }
+.dock-btn:hover { transform:translateY(-3px); }
+.dock-btn svg { width:28px; height:28px; stroke-width:2; }
+
+#monthly-chart { max-width:900px; width:100%; height:300px; background:rgba(255,255,255,0.85); border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.08); padding:15px; margin-top:20px; }
+
+@media print {
+  body * { visibility: hidden; }
+  #log-table, #log-table * { visibility: visible; }
+  #log-table { position: relative; top:auto; left:auto; width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="form-container">
+    <input type="date" id="log-date">
+
+    <label><input type="checkbox" id="agua"> Beber 2L Água</label>
+    <label><input type="checkbox" id="sono"> Dormir 7–8h/noite</label>
+    <label><input type="checkbox" id="ginasio"> Ir ao Ginásio</label>
+    <label><input type="checkbox" id="caminhar"> Caminhar 10.000 passos</label>
+    <label><input type="checkbox" id="ler"> Ler 15 minutos</label>
+    <label><input type="checkbox" id="alimentacao"> Alimentação Saudável</label>
+    <label><input type="checkbox" id="cafes"> 2 cafés/dia</label>
+    <label><input type="checkbox" id="planear"> Planear o dia de manhã</label>
+    <label><input type="checkbox" id="rever"> Rever objetivos à noite</label>
+    <div class="buttons-container">
+      <button onclick="saveLog()">✅ Guardar</button>
+      <button onclick="clearAll()" class="red">🗑️ Limpar Tudo</button>
+      <button onclick="exportTableToXLSX('objetivos.xlsx')">📄 XLSX</button>
+      <button onclick="window.print()">📄 PDF</button>
+    </div>
+  </div>
+
+  <table id="log-table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>2L Água</th>
+        <th>7–8h Sono</th>
+        <th>Ginásio</th>
+        <th>10.000 Passos</th>
+        <th>Ler 15m</th>
+        <th>Alimentação</th>
+        <th>2 cafés</th>
+        <th>Total</th>        
+        <th>Planear</th>
+        <th>Rever</th>
+      </tr>
+    </thead>
+    <tbody id="log-tbody"></tbody>
+  </table>
+
+  <canvas id="monthly-chart"></canvas>
+
+</div>
+
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+
+<script>
+let monthData = JSON.parse(localStorage.getItem('monthData') || '{}');
+
+function saveLog() {
+  const date = document.getElementById('log-date').value;
+  if (!date) return;
+
+  const checks = [
+    document.getElementById('agua').checked,
+    document.getElementById('sono').checked,
+    document.getElementById('ginasio').checked,
+    document.getElementById('caminhar').checked,
+    document.getElementById('ler').checked,
+    document.getElementById('alimentacao').checked,
+    document.getElementById('cafes').checked,    
+    document.getElementById('planear').checked,
+    document.getElementById('rever').checked
+  ];
+
+  monthData[date] = checks;
+  localStorage.setItem('monthData', JSON.stringify(monthData));
+  renderTable();
+  renderChart();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('log-tbody');
+  tbody.innerHTML = '';
+  const sortedDates = Object.keys(monthData).sort();
+
+  sortedDates.forEach(date => {
+    const row = document.createElement('tr');
+    const dataRow = monthData[date];
+    const total = dataRow.filter(Boolean).length;
+
+    row.innerHTML = `<td>${date}</td>` +
+      dataRow.map(done => `<td>${done ? '✔️' : ''}</td>`).join('') +
+      `<td>${total}</td>`;
+
+    tbody.appendChild(row);
+  });
+}
+
+function clearAll() {
+  localStorage.removeItem('monthData');
+  monthData = {};
+  renderTable();
+  renderChart();
+}
+
+function exportTableToXLSX(filename) {
+  const ws_data = [];
+  const rows = document.querySelectorAll("#log-table tr");
+  rows.forEach(row => {
+    const cols = row.querySelectorAll("td, th");
+    const rowData = [];
+    cols.forEach(col => rowData.push(col.innerText));
+    ws_data.push(rowData);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  XLSX.utils.book_append_sheet(wb, ws, "Objetivos");
+  XLSX.writeFile(wb, filename);
+}
+
+function renderChart() {
+  const ctx = document.getElementById('monthly-chart').getContext('2d');
+  const dates = Object.keys(monthData).sort();
+  const totalCumprido = dates.map(d => monthData[d].filter(Boolean).length);
+
+  if (window.monthChart) window.monthChart.destroy();
+
+  window.monthChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [{
+        label: 'Total Cumprido',
+        data: totalCumprido,
+        borderColor: '#007aff',
+        backgroundColor: 'rgba(0,122,255,0.2)',
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#007aff',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top', labels:{boxWidth:12, padding:15, font:{size:14}} },
+        tooltip: { enabled:true }
+      },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ color:'#111', font:{size:12}} },
+        y: { beginAtZero:true, stepSize:1, grid:{ display:false }, ticks:{ color:'#111', font:{size:12}, precision:0} }
+      }
+    }
+  });
+}
+
+renderTable();
+renderChart();
+</script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orçamento Mensal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+  .form-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 900px;
+  }
+  .form-container input[type="text"],
+  .form-container input[type="number"],
+  .form-container select {
+    flex: 1 1 150px;
+    padding: 12px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .form-container input:focus,
+  .form-container select:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+  .form-container button {
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: none;
+    background: #3498db;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .form-container button:hover {
+    background: #2980b9;
+  }
+  table {
+    width: 100%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.85);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  th {
+    background: rgba(0,0,0,0.05);
+  }
+  tr:nth-child(even) {
+    background: rgba(0,0,0,0.03);
+  }
+  .dock {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    bottom: 0;
+  }
+  .dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #111;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.2s;
+  }
+  .dock-btn:hover { transform: translateY(-3px); }
+  .dock-btn svg { width: 28px; height: 28px; stroke-width: 2; }
+
+  #budget-chart {
+    max-width: 500px;
+    max-height: 500px;
+    margin: 20px auto;
+  }
+
+@media print {
+  body * { visibility: hidden; }
+  #budget-table, #budget-table *, #budget-chart, #budget-chart * { visibility: visible; }
+  
+  #budget-chart {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  #budget-table {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="form-container">
+    <input type="number" id="total-budget" placeholder="Orçamento Total (€)" step="0.01" min="0">
+    <select id="category-select">
+      <option value="Alimentação">Alimentação</option>
+      <option value="Transporte">Transporte</option>
+      <option value="Casa">Casa</option>
+      <option value="Lazer">Lazer</option>
+      <option value="Desporto">Desporto</option>
+      <option value="Saúde">Saúde</option>
+      <option value="Compras pessoais">Compras pessoais</option>
+      <option value="Investimento">Investimento</option>
+      <option value="Poupanças">Poupanças</option>
+      <option value="Comunicações">Comunicações</option>
+      <option value="Reparações diversas">Reparações diversas</option>
+      <option value="Viagens e férias">Viagens e férias</option>
+      <option value="Entretenimento">Entretenimento</option>
+      <option value="Outro">Outro</option>
+    </select>
+    <input type="text" id="category-description" placeholder="Descrição">
+    <input type="number" id="category-value" placeholder="Valor (€)" step="0.01" min="0">
+    <button onclick="addCategory()">➕ Adicionar</button>
+    <button id="exportPDF">📄 Exportar PDF</button>
+    <button onclick="clearAll()">🧹 Limpar Tudo</button>
+  </div>
+
+  <table id="budget-table">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Descrição</th>
+        <th>Valor (€)</th>
+        <th>Percentagem (%)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td>Total</td>
+        <td></td>
+        <td id="total-value">0.00 €</td>
+        <td id="total-percentage">100%</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <canvas id="budget-chart"></canvas>
+
+</div>
+
+<div class="dock">
+  <a href="pessoal.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+      1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+    </svg>
+    Pessoal
+  </a>
+
+  <a href="casa.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+    </svg>
+    Casa
+  </a>
+
+  <a href="profissional.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+    </svg>
+    Profissional
+  </a>
+</div>
+
+<script>
+const categorySelect = document.getElementById('category-select');
+const categoryValue = document.getElementById('category-value');
+const categoryDescription = document.getElementById('category-description');
+const totalBudgetInput = document.getElementById('total-budget');
+const budgetTableBody = document.querySelector('#budget-table tbody');
+const totalValueEl = document.getElementById('total-value');
+const totalPercentageEl = document.getElementById('total-percentage');
+
+let budgetData = JSON.parse(localStorage.getItem('budgetData') || '[]');
+let totalBudget = parseFloat(localStorage.getItem('totalBudget') || '0');
+
+function saveData() {
+  localStorage.setItem('budgetData', JSON.stringify(budgetData));
+  localStorage.setItem('totalBudget', totalBudget);
+}
+
+function renderTable() {
+  budgetTableBody.innerHTML = '';
+  let sum = 0;
+  budgetData.forEach((item, index) => {
+    const row = document.createElement('tr');
+    let percent = totalBudget > 0 ? (item.value / totalBudget * 100).toFixed(1) : 0;
+    row.innerHTML = `<td>${item.name}</td><td>${item.description}</td><td>${item.value.toFixed(2)} €</td><td>${percent} %</td>`;
+    budgetTableBody.appendChild(row);
+    sum += item.value;
+  });
+  totalValueEl.textContent = sum.toFixed(2) + ' €';
+  totalPercentageEl.textContent = '100%';
+  renderChart();
+}
+
+function addCategory() {
+  const value = parseFloat(categoryValue.value);
+  const description = categoryDescription.value || '';
+  if (!categorySelect.value || !value || totalBudget <= 0) return;
+  budgetData.push({ name: categorySelect.value, description, value });
+  saveData();
+  renderTable();
+  categoryValue.value = '';
+  categoryDescription.value = '';
+}
+
+function clearAll() {
+  budgetData = [];
+  saveData();
+  renderTable();
+}
+
+function renderChart() {
+  const ctx = document.getElementById('budget-chart').getContext('2d');
+  if (window.budgetChart) window.budgetChart.destroy();
+  const labels = [...new Set(budgetData.map(d => d.name))]; // só categorias únicas
+  const values = labels.map(l => {
+    return budgetData.filter(d => d.name === l).reduce((sum, i) => sum + i.value, 0);
+  });
+  window.budgetChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: [
+          '#3498db','#e74c3c','#2ecc71','#9b59b6','#f1c40f','#1abc9c','#e67e22','#95a5a6','#34495e','#d35400'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let percent = totalBudget > 0 ? (context.raw / totalBudget * 100).toFixed(1) : 0;
+              return `${context.label}: ${context.raw.toFixed(2)} € (${percent}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+totalBudgetInput.addEventListener('change', () => {
+  totalBudget = parseFloat(totalBudgetInput.value);
+  saveData();
+  renderTable();
+});
+
+document.getElementById('exportPDF').addEventListener('click', () => {
+  window.print();
+});
+
+totalBudgetInput.value = totalBudget || '';
+renderTable();
+</script>
+</body>
+</html>

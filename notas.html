@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notas Compactas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #fafafa;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 1.5rem;
+      margin: 10px 0;
+    }
+
+    .add-note-container {
+      display: flex;
+      gap: 5px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .add-note-container textarea {
+      flex: 1;
+      padding: 10px;
+      border-radius: 15px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      resize: none;
+      min-height: 60px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .primary-btn, .secondary-btn {
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .primary-btn { background-color: #111; color: #fff; }
+    .primary-btn:hover { background-color: #333; }
+
+    .secondary-btn { background-color: #fff; color: #111; border: 1px solid #ccc; }
+    .secondary-btn:hover { background-color: #eee; }
+
+    .notes {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .note-item {
+      background: rgba(255,255,204,0.85);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      word-wrap: break-word;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .note-text {
+      flex: 1;
+      margin-right: 10px;
+      white-space: pre-wrap;
+      outline: none;
+      cursor: text;
+      min-height: 20px;
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .action-btn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #111;
+    }
+    .action-btn:hover { color: #555; }
+
+    .clear-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      border-radius: 15px;
+      border: none;
+      background-color: #555;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .clear-btn:hover { background-color: #333; }
+
+    .dock {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(10px);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .dock-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; text-decoration: none; color: #111; }
+    .dock-btn svg { width: 20px; height: 20px; stroke-width: 2; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #notes, #notes * { visibility: visible; }
+      #notes { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Notas</h1>
+    <div class="add-note-container">
+      <textarea id="new-note" placeholder="Escreva sua nota..."></textarea>
+      <div class="btn-group">
+        <button id="add-note-btn" class="primary-btn">➕</button>
+        <button id="export-pdf-btn" class="secondary-btn">📄</button>
+      </div>
+    </div>
+
+    <div class="notes" id="notes"></div>
+
+    <button class="clear-btn" id="clear-btn">Limpar Todas</button>
+  </div>
+
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+
+  <script>
+    const notesEl = document.getElementById('notes');
+    const addNoteBtn = document.getElementById('add-note-btn');
+    const newNoteInput = document.getElementById('new-note');
+    const clearBtn = document.getElementById('clear-btn');
+    const exportPDFBtn = document.getElementById('export-pdf-btn');
+
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    function saveNotes() { localStorage.setItem('notes', JSON.stringify(notes)); }
+
+    function renderNotes() {
+      notesEl.innerHTML = '';
+      notes.forEach((note, i) => {
+        const div = document.createElement('div');
+        div.className = 'note-item';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'note-text';
+        textDiv.contentEditable = true;
+        textDiv.textContent = note.text;
+
+        // Salvar ao sair do foco
+        textDiv.addEventListener('input', () => {
+          notes[i].text = textDiv.textContent;
+          saveNotes();
+        });
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'note-actions';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'action-btn';
+        deleteBtn.textContent = '🗑️';
+        deleteBtn.title = 'Excluir';
+        deleteBtn.addEventListener('click', () => {
+          notes.splice(i, 1);
+          saveNotes();
+          renderNotes();
+        });
+
+        actionsDiv.appendChild(deleteBtn);
+        div.appendChild(textDiv);
+        div.appendChild(actionsDiv);
+        notesEl.appendChild(div);
+      });
+    }
+
+    function addNote() {
+      const text = newNoteInput.value.trim();
+      if(text) {
+        notes.push({text});
+        saveNotes();
+        renderNotes();
+        newNoteInput.value='';
+      }
+    }
+
+    addNoteBtn.addEventListener('click', addNote);
+    newNoteInput.addEventListener('keypress', e => {
+      if(e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        addNote();
+      }
+    });
+    clearBtn.addEventListener('click', () => {
+      notes = [];
+      saveNotes();
+      renderNotes();
+    });
+    exportPDFBtn.addEventListener('click', () => { window.print(); });
+
+    renderNotes();
+  </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #fafafa;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .hub-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 2rem;
+      color: #111;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .add-task-container {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .add-task-container input {
+      flex: 1;
+      padding: 12px 15px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .add-task-container button {
+      padding: 12px 20px;
+      border: none;
+      background-color: #111;
+      color: #fff;
+      font-weight: 500;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .add-task-container button:hover {
+      background-color: #333;
+    }
+
+    .checklist {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      background: rgba(255,255,255,0.85);
+      padding: 14px 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: all 0.2s;
+    }
+
+    .check-item:hover {
+      transform: scale(1.02);
+    }
+
+    .check-item input[type="checkbox"] {
+      margin-right: 15px;
+      width: 20px;
+      height: 20px;
+      accent-color: #111;
+      cursor: pointer;
+    }
+
+    .check-item label {
+      flex: 1;
+      font-size: 1rem;
+    }
+
+    .check-item.completed label {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .clear-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: none;
+      background-color: #555;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .clear-btn:hover {
+      background-color: #333;
+    }
+
+    .dock {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 12px 0;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(15px);
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .dock-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #111;
+      text-decoration: none;
+      gap: 4px;
+      transition: transform 0.2s;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .dock-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #111;
+        color: #fff;
+      }
+      .check-item {
+        background: rgba(28,28,30,0.85);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+      .check-item input[type="checkbox"] {
+        accent-color: #fff;
+      }
+      .add-task-container input {
+        background-color: #1c1c1e;
+        color: #fff;
+        border: 1px solid #555;
+      }
+      .dock {
+        background: rgba(28,28,30,0.7);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+      }
+      .dock-btn {
+        color: #fff;
+      }
+      .dock-btn svg {
+        stroke: #fff;
+      }
+      .add-task-container button {
+        background-color: #fff;
+        color: #111;
+      }
+      .add-task-container button:hover {
+        background-color: #ddd;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hub-container {
+        padding: 10px;
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #checklist, #checklist * {
+        visibility: visible;
+      }
+
+      #checklist {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hub-container">
+    <h1>Checklist</h1>
+
+    <div class="add-task-container">
+      <input type="text" id="new-task" placeholder="Adicionar nova tarefa...">
+      <button id="add-task-btn">➕ Adicionar</button>
+      <button id="export-pdf-btn">📄 Exportar PDF</button>
+    </div>
+
+    <div class="checklist" id="checklist"></div>
+
+    <button class="clear-btn" id="clear-btn">🧹 Limpar Todas</button>
+  </div>
+
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+
+  <script>
+    const checklistEl = document.getElementById('checklist');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const newTaskInput = document.getElementById('new-task');
+    const clearBtn = document.getElementById('clear-btn');
+    const exportPdfBtn = document.getElementById('export-pdf-btn');
+
+    // Carrega tarefas do localStorage
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      checklistEl.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const div = document.createElement('div');
+        div.className = 'check-item';
+        if (task.completed) div.classList.add('completed');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.addEventListener('change', () => {
+          tasks[index].completed = checkbox.checked;
+          div.classList.toggle('completed', checkbox.checked);
+          saveTasks();
+        });
+
+        const label = document.createElement('label');
+        label.textContent = task.text;
+
+        div.appendChild(checkbox);
+        div.appendChild(label);
+
+        checklistEl.appendChild(div);
+      });
+    }
+
+    addTaskBtn.addEventListener('click', () => {
+      const text = newTaskInput.value.trim();
+      if (text) {
+        tasks.push({ text, completed: false });
+        saveTasks();
+        renderTasks();
+        newTaskInput.value = '';
+      }
+    });
+
+    newTaskInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        addTaskBtn.click();
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      tasks = [];
+      saveTasks();
+      renderTasks();
+    });
+
+    exportPdfBtn.addEventListener('click', () => {
+      window.print();
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>

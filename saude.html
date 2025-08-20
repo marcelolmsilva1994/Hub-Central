@@ -1,0 +1,323 @@
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Evolução Física</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f2f2f7;
+    margin: 0;
+    padding: 0;
+    color: #1c1c1e;
+  }
+  h1 {
+    text-align: center;
+    margin: 50px 0 30px;
+    font-weight: 700;
+    font-size: 32px;
+    color: #1c1c1e;
+  }
+  .grafico-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 25px auto;
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .grafico-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  }
+  h2 {
+    text-align: center;
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #3c3c44;
+  }
+  canvas {
+    width: 100% !important;
+    height: 360px !important;
+  }
+      .dock {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 12px 0;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(15px);
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .dock-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #111;
+      text-decoration: none;
+      gap: 4px;
+      transition: transform 0.2s;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .dock-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #111;
+        color: #fff;
+      }
+      .hub-btn {
+        background: rgba(28,28,30,0.85);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      }
+      .hub-btn:hover {
+        background: rgba(28,28,30,0.95);
+      }
+      .hub-btn svg, .dock-btn svg {
+        stroke: #fff;
+      }
+      .dock {
+        background: rgba(28,28,30,0.7);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+      }
+      .dock-btn {
+        color: #fff;
+      }
+    }
+</style>
+</head>
+<body>
+
+<h1>Evolução Física</h1>
+
+<div class="grafico-container">
+  <h2>Passos Diários</h2>
+  <canvas id="chartPassos"></canvas>
+</div>
+
+<div class="grafico-container">
+  <h2>Distância Diária (km)</h2>
+  <canvas id="chartDistancia"></canvas>
+</div>
+
+<div class="grafico-container">
+  <h2>Peso Corporal (kg)</h2>
+  <canvas id="chartPeso"></canvas>
+</div>
+
+<div class="grafico-container">
+  <h2>IMC</h2>
+  <canvas id="chartIMC"></canvas>
+</div>
+
+<div class="grafico-container">
+  <h2>Medidas Corporais (cm)</h2>
+  <canvas id="chartMedidas"></canvas>
+</div>
+  <div class="dock">
+    <a href="pessoal.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
+        1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+      </svg>
+      Pessoal
+    </a>
+
+    <a href="casa.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+      </svg>
+      Casa
+    </a>
+
+    <a href="profissional.html" class="dock-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+      </svg>
+      Profissional
+    </a>
+  </div>
+<script>
+const urlPassos = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRY1wuQHAz4i4UsfqJgBqn8lXRNJWB8NaaDtDN0j76oLN5SjoOl30W9yzMOkki6NzBDl4PrLsMUCfAV/pub?gid=31100675&single=true&output=csv';
+const urlPeso   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRY1wuQHAz4i4UsfqJgBqn8lXRNJWB8NaaDtDN0j76oLN5SjoOl30W9yzMOkki6NzBDl4PrLsMUCfAV/pub?gid=105235135&single=true&output=csv';
+
+function drawGoalLine(chart, yValue, label, color) {
+  const ctx = chart.ctx;
+  const y = chart.scales.y.getPixelForValue(yValue);
+  ctx.save();
+  ctx.setLineDash([6,4]);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(chart.scales.x.left, y);
+  ctx.lineTo(chart.scales.x.right, y);
+  ctx.stroke();
+  ctx.font = 'bold 13px "SF Pro Display"';
+  ctx.fillStyle = color;
+  ctx.textAlign = 'right';
+  ctx.fillText(label, chart.scales.x.right - 10, y - 5);
+  ctx.restore();
+}
+
+async function fetchCSV(url, columns) {
+  const res = await fetch(url);
+  const text = await res.text();
+  const lines = text.trim().split('\n').slice(1);
+  return lines.map(line => {
+    const values = line.split(',');
+    const obj = { date: values[0].split('/').reverse().join('-') };
+    columns.forEach((col, i) => {
+      if(values[i+1]) {
+        const num = values[i+1].replace(/[\s]/g, '').replace(',', '.');
+        obj[col] = parseFloat(num);
+      } else obj[col] = null;
+    });
+    return obj;
+  });
+}
+
+function calcularIMCeGordura(peso, altura, idade, sexo) {
+  const imc = peso / (altura * altura);
+  const sexoNum = (sexo === 'masculino') ? 1 : 0;
+  const gordura = 1.2 * imc + 0.23 * idade - 10.8 * sexoNum - 5.4;
+  return { imc, gordura };
+}
+
+async function createCharts() {
+  const altura = 1.68;
+  const idade = 31;
+  const sexo = 'masculino';
+  
+  const dataPD = await fetchCSV(urlPassos, ['steps', 'distance']);
+  const dataPeso = await fetchCSV(urlPeso, ['weight', 'braco', 'coxa', 'cintura', 'umbigo', 'anca']);
+
+  // Limitar IMC a 2 casas decimais
+  const dataIMC = dataPeso.map(d => {
+    const imc = calcularIMCeGordura(d.weight, altura, idade, sexo).imc;
+    return { date: d.date, value: parseFloat(imc.toFixed(2)) };
+  });
+
+  function makeLineChart(ctx, label, dataArray, key, color, goal, goalLabel, minY, fixDecimals=false) {
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dataArray.map(d => d.date),
+        datasets: [{
+          label,
+          data: dataArray.map(d => d[key] || d.value),
+          borderColor: color,
+          backgroundColor: color + '33',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 8,
+          pointBackgroundColor: color,
+          borderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: true, labels: { padding: 20, font: { size: 14 } } },
+          tooltip: {
+            backgroundColor: 'rgba(60,60,67,0.9)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            cornerRadius: 12,
+            padding: 12,
+            displayColors: false,
+            callbacks: {
+              label: ctx => {
+                let val = ctx.parsed.y;
+                if(fixDecimals) val = val.toFixed(2);
+                return `${ctx.dataset.label}: ${val}${label==='Peso'?' kg': label==='Distância'?' km':''}` 
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: { parser: 'yyyy-MM-dd', unit: 'month', displayFormats:{month:'MMM'}, tooltipFormat:'dd/MM/yyyy' },
+            adapters: { date: { locale: 'pt-BR' } },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: false,
+            min: minY || undefined,
+            grid: { display: false },
+            ticks: { precision: 0 }
+          }
+        },
+        animation: { duration: 900, easing: 'easeOutQuart' }
+      },
+      plugins: goal!==null ? [{
+        id: 'goalLine',
+        afterDraw: chart => drawGoalLine(chart, goal, goalLabel, '#ff3b30')
+      }] : []
+    });
+  }
+
+  makeLineChart(document.getElementById('chartPassos').getContext('2d'), 'Passos', dataPD, 'steps', '#007aff', 10000, 'Meta: 10.000 passos');
+  makeLineChart(document.getElementById('chartDistancia').getContext('2d'), 'Distância', dataPD, 'distance', '#34c759', 5, 'Meta: 5 km');
+  makeLineChart(document.getElementById('chartPeso').getContext('2d'), 'Peso', dataPeso, 'weight', '#ff9500', 64, 'Meta: 64 kg', 55);
+  makeLineChart(document.getElementById('chartIMC').getContext('2d'), 'IMC', dataIMC, 'value', '#5856d6', 20, 'Meta: 20', 18, true);
+
+  new Chart(document.getElementById('chartMedidas').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: dataPeso.map(d => d.date),
+      datasets: [
+        { label: 'Braço', data: dataPeso.map(d => d.braco), borderColor: '#007aff', tension: 0.4, fill: false, pointRadius: 5, pointBackgroundColor:'#007aff', borderWidth: 3 },
+        { label: 'Coxa', data: dataPeso.map(d => d.coxa), borderColor: '#34c759', tension: 0.4, fill: false, pointRadius: 5, pointBackgroundColor:'#34c759', borderWidth: 3 },
+        { label: 'Cintura', data: dataPeso.map(d => d.cintura), borderColor: '#ff9500', tension: 0.4, fill: false, pointRadius: 5, pointBackgroundColor:'#ff9500', borderWidth: 3 },
+        { label: 'Umbigo', data: dataPeso.map(d => d.umbigo), borderColor: '#5856d6', tension: 0.4, fill: false, pointRadius: 5, pointBackgroundColor:'#5856d6', borderWidth: 3 },
+        { label: 'Anca', data: dataPeso.map(d => d.anca), borderColor: '#ff2d55', tension: 0.4, fill: false, pointRadius: 5, pointBackgroundColor:'#ff2d55', borderWidth: 3 }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: true, labels: { padding: 15, font: { size: 14 } } } },
+      scales: {
+        x: {
+          type: 'time',
+          time: { parser: 'yyyy-MM-dd', unit: 'month', displayFormats:{month:'MMM'}, tooltipFormat:'dd/MM/yyyy' },
+          adapters: { date: { locale: 'pt-BR' } },
+          grid: { display: false }
+        },
+        y: { grid: { display: false }, beginAtZero: false }
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' }
+    }
+  });
+
+}
+
+createCharts();
+</script>
+
+</body>
+</html>

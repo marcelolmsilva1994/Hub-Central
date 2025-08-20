@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objetivos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:#fafafa;
+  color:#111;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+.container {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:10px;
+}
+h1 { font-weight:500; font-size:1.5rem; margin:10px 0; }
+.add-goal-container {
+  display:flex;
+  gap:5px;
+  width:100%;
+  max-width:500px;
+  margin-bottom:10px;
+}
+.add-goal-container input {
+  padding:10px;
+  border-radius:15px;
+  border:1px solid #ccc;
+  font-size:0.95rem;
+}
+.add-goal-container input[name="name"] { flex:1; }
+.add-goal-container input[name="total"] { width:80px; }
+.btn-group {
+  display:flex;
+  gap:5px;
+}
+.primary-btn, .secondary-btn {
+  border:none;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  font-size:1rem;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.primary-btn { background-color:#111; color:#fff; }
+.primary-btn:hover { background-color:#333; }
+.secondary-btn { background-color:#fff; color:#111; border:1px solid #ccc; }
+.secondary-btn:hover { background-color:#eee; }
+
+.goals {
+  width:100%;
+  max-width:500px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+.goal-item {
+  position: relative; /* Para o botão de deletar */
+  background: rgba(255,255,255,0.9);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.del-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.goal-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.goal-row input {
+  width:70px;
+  padding:5px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex:1;
+}
+.progress-bar {
+  flex:1;
+  height:18px;
+  background:#eee;
+  border-radius:10px;
+  overflow:hidden;
+}
+.progress-fill {
+  height:100%;
+  width:0%;
+  background:#f54;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.clear-btn {
+  margin-top:10px;
+  padding:8px 15px;
+  border-radius:15px;
+  border:none;
+  background-color:#555;
+  color:#fff;
+  cursor:pointer;
+  font-size:0.95rem;
+}
+.clear-btn:hover { background-color:#333; }
+
+.dock {
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  padding:12px 0;
+  background:rgba(255,255,255,0.7);
+  backdrop-filter:blur(15px);
+  border-top-left-radius:25px;
+  border-top-right-radius:25px;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.08);
+  position:sticky;
+  bottom:0;
+}
+.dock-btn {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  font-size:0.75rem;
+  color:#111;
+  text-decoration:none;
+  gap:4px;
+  transition:transform 0.2s;
+}
+.dock-btn:hover { transform:translateY(-3px); }
+.dock-btn svg { width:28px; height:28px; stroke-width:2; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Objetivos</h1>
+  <div class="add-goal-container">
+    <input type="text" id="goalName" name="name" placeholder="Objetivo">
+    <input type="number" id="goalTotal" name="total" placeholder="Meta">
+    <div class="btn-group">
+      <button id="addGoalBtn" class="primary-btn">➕</button>
+    </div>
+  </div>
+  <div class="goals" id="goals"></div>
+  <button class="clear-btn" id="clearBtn">Limpar Todos</button>
+</div>
+
+<div class="dock">
+  <a href="pessoal.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"/>
+    </svg>
+    Pessoal
+  </a>
+  <a href="casa.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 4l9 5.75M4.5 10.5v9.75h15V10.5"/>
+    </svg>
+    Casa
+  </a>
+  <a href="profissional.html" class="dock-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12v12H6V7zm3-3h6v3H9V4z"/>
+    </svg>
+    Profissional
+  </a>
+</div>
+
+<script>
+const goalsEl = document.getElementById('goals');
+const addGoalBtn = document.getElementById('addGoalBtn');
+const goalNameInput = document.getElementById('goalName');
+const goalTotalInput = document.getElementById('goalTotal');
+const clearBtn = document.getElementById('clearBtn');
+
+let goals = JSON.parse(localStorage.getItem('goals')) || [];
+
+function saveGoals(){ localStorage.setItem('goals', JSON.stringify(goals)); }
+
+function getColor(goal){
+  const pct = (goal.current/goal.total)*100;
+  if(pct >= 100) return '#4caf50'; // verde concluído
+  if(pct >= 50) return '#ffb400';  // amarelo
+  return '#f54';                    // vermelho
+}
+
+function renderGoals(){
+  goalsEl.innerHTML = '';
+  goals.forEach((g,i)=>{
+    const div = document.createElement('div');
+    div.className='goal-item';
+    const pct = Math.min((g.current/g.total)*100,100);
+    div.innerHTML = `
+      <button class="del-btn" id="del${i}">❌</button>
+      <div><b>${g.name}</b></div>
+      <div class="goal-row">
+        Atual: <input type="number" value="${g.current}" min="0" max="${g.total}" id="current${i}">
+        <div class="progress-wrapper">
+          <div class="progress-bar">
+            <div class="progress-fill" id="fill${i}" style="width:${pct}%; background:${getColor(g)}"></div>
+          </div>
+          <span>${Math.round(pct)}%</span>
+        </div>
+      </div>
+    `;
+    goalsEl.appendChild(div);
+
+    document.getElementById(`current${i}`).addEventListener('input', e=>{
+      g.current = Number(e.target.value);
+      if(g.current > g.total) g.current = g.total;
+      saveGoals();
+      renderGoals();
+    });
+
+    document.getElementById(`del${i}`).addEventListener('click',()=>{
+      goals.splice(i,1);
+      saveGoals();
+      renderGoals();
+    });
+  });
+}
+
+addGoalBtn.addEventListener('click',()=>{
+  const name = goalNameInput.value.trim();
+  const total = Number(goalTotalInput.value);
+  if(name && total>0){
+    goals.push({name,total,current:0});
+    saveGoals();
+    renderGoals();
+    goalNameInput.value='';
+    goalTotalInput.value='';
+  }
+});
+
+clearBtn.addEventListener('click',()=>{
+  goals=[];
+  saveGoals();
+  renderGoals();
+});
+
+renderGoals();
+</script>
+</body>
+</html>

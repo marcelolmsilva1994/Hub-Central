@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registo de Vagas de Emprego</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+  .form-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 900px;
+  }
+  .form-container input[type="text"],
+  .form-container input[type="date"],
+  .form-container select {
+    flex: 1 1 150px;
+    padding: 12px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .form-container input:focus,
+  .form-container select:focus {
+    border-color: #2980b9;
+    outline: none;
+  }
+  .form-container button {
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: none;
+    background: #2980b9;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .form-container button:hover {
+    background: #1c5980;
+  }
+  table {
+    width: 100%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.85);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  th {
+    background: rgba(0,0,0,0.05);
+  }
+  tr:nth-child(even) {
+    background: rgba(0,0,0,0.03);
+  }
+  .delete-btn {
+    background: #e74c3c;
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .delete-btn:hover {
+    background: #c0392b;
+  }
+  .status-select {
+    border-radius: 10px;
+    padding: 5px;
+    width: 100%;
+  }
+  @media print {
+    body * { visibility: hidden; }
+    #job-table, #job-table * { visibility: visible; }
+    #job-table { position: absolute; left: 0; top: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="form-container">
+    <input type="date" id="date-input">
+    <input type="text" id="company-input" placeholder="Empresa">
+    <input type="text" id="position-input" placeholder="Cargo/Posição">
+    <select id="status-select">
+      <option value="Candidatura enviada">Candidatura enviada</option>
+      <option value="Entrevista">Entrevista</option>
+      <option value="Oferta recebida">Oferta recebida</option>
+      <option value="Recusado">Recusado</option>
+    </select>
+    <button onclick="addJob()">➕ Adicionar</button>
+    <button onclick="exportPDF()">📄 Exportar PDF</button>
+    <button onclick="exportExcel()">📊 Exportar Excel</button>
+    <button onclick="clearAllJobs()">🧹 Limpar Tudo</button>
+  </div>
+
+  <table id="job-table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Empresa</th>
+        <th>Posição</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</div>
+
+<script>
+const dateInput = document.getElementById('date-input');
+const companyInput = document.getElementById('company-input');
+const positionInput = document.getElementById('position-input');
+const statusSelect = document.getElementById('status-select');
+const tableBody = document.querySelector('#job-table tbody');
+
+let jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+
+function saveJobs() {
+  localStorage.setItem('jobs', JSON.stringify(jobs));
+}
+
+function formatDate(isoDate) {
+  if (!isoDate) return "";
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+function renderJobs() {
+  tableBody.innerHTML = '';
+  jobs.forEach((job, index) => {
+    const row = document.createElement('tr');
+
+    const statusOptions = `
+      <select class="status-select" onchange="updateStatus(${index}, this.value)">
+        <option value="Candidatura enviada" ${job.status === 'Candidatura enviada' ? 'selected' : ''}>Candidatura enviada</option>
+        <option value="Entrevista" ${job.status === 'Entrevista' ? 'selected' : ''}>Entrevista</option>
+        <option value="Oferta recebida" ${job.status === 'Oferta recebida' ? 'selected' : ''}>Oferta recebida</option>
+        <option value="Recusado" ${job.status === 'Recusado' ? 'selected' : ''}>Recusado</option>
+      </select>
+    `;
+
+    row.innerHTML = `
+      <td>${formatDate(job.date)}</td>
+      <td>${job.company}</td>
+      <td>${job.position}</td>
+      <td>${statusOptions}</td>
+      <td>
+        <button class="delete-btn" onclick="deleteJob(${index})">❌</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+function addJob() {
+  const newJob = {
+    date: dateInput.value,
+    company: companyInput.value.trim(),
+    position: positionInput.value.trim(),
+    status: statusSelect.value
+  };
+  if(!newJob.date || !newJob.company || !newJob.position) return;
+  jobs.push(newJob);
+  saveJobs();
+  renderJobs();
+  dateInput.value = '';
+  companyInput.value = '';
+  positionInput.value = '';
+}
+
+function deleteJob(index) {
+  jobs.splice(index, 1);
+  saveJobs();
+  renderJobs();
+}
+
+function clearAllJobs() {
+  jobs = [];
+  saveJobs();
+  renderJobs();
+}
+
+function updateStatus(index, newStatus) {
+  jobs[index].status = newStatus;
+  saveJobs();
+}
+
+// Export PDF
+function exportPDF() {
+  window.print();
+}
+
+// Export Excel
+function exportExcel() {
+  let table = document.getElementById('job-table').outerHTML;
+  let dataType = 'application/vnd.ms-excel';
+  let blob = new Blob([table], { type: dataType });
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = 'vagas_emprego.xls';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Inicializa tabela
+renderJobs();
+</script>
+
+</body>
+</html>

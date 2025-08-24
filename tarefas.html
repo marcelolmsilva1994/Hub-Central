@@ -15,9 +15,6 @@ body {
     min-height: 100vh;
 }
 
-
-
-
 .container {
     flex: 1;
     display: flex;
@@ -98,14 +95,16 @@ body {
 }
 
 .task {
-    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
     border-radius: 10px;
     cursor: grab;
     background: #fff;
     color: black;
     font-size: 14px;
     font-weight: 500;
-    text-align: center;
     border: 1px solid #000;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     transition: all 0.2s ease-in-out;
@@ -114,6 +113,19 @@ body {
 .task:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task button {
+    background: transparent;
+    border: none;
+    color: #c00;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.task button:hover {
+    color: #f00;
 }
 
 .task:active {
@@ -163,31 +175,20 @@ body {
 }
 
 @media print {
-    /* Esconder tudo */
     body * { visibility: hidden; }
-
-    /* Mostrar apenas a tabela (as divs .day) */
     .board, .board * { visibility: visible; }
-
-    /* Posicionar a tabela no topo da página */
     .board { 
         position: absolute; 
         left: 0; 
         top: 0; 
         width: 100%; 
     }
-
-    /* Esconder inputs, botões e outras seções */
     #tasks, #newTaskContainer, .form-container, .dock, header, h2 { display: none; }
-
-    /* Ajustes de impressão */
     body { margin: 0; font-size: 12pt; }
 }
-
 </style>
 </head>
 <body>
-
 
 <div class="container">
     <div class="form-container">
@@ -210,21 +211,21 @@ body {
 
 <h2>Tarefas Pré-definidas</h2>
 <div id="tasks">
-    <div class="task" draggable="true">Limpar o pó</div>
-    <div class="task" draggable="true">Aspirar</div>
-    <div class="task" draggable="true">Loiças do wc</div>
-    <div class="task" draggable="true">Dobrar a roupa</div>
-    <div class="task" draggable="true">Passar esfregona</div>
-    <div class="task" draggable="true">Lavar Roupa</div>
-    <div class="task" draggable="true">Roupa secar</div>
-    <div class="task" draggable="true">Supermercado</div>
-    <div class="task" draggable="true">Varrer chão cozinha</div>
-    <div class="task" draggable="true">Lavar microondas</div>
-    <div class="task" draggable="true">Lavar máquina de café</div>
-    <div class="task" draggable="true">Ir ao lixo</div>
+    <div class="task" draggable="true"><span>Limpar o pó</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Aspirar</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Loiças do wc</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Dobrar a roupa</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Passar esfregona</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Lavar Roupa</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Roupa secar</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Supermercado</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Varrer chão cozinha</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Lavar microondas</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Lavar máquina de café</span><button>✖</button></div>
+    <div class="task" draggable="true"><span>Ir ao lixo</span><button>✖</button></div>
 </div>
 
-  <div class="dock">
+<div class="dock">
     <a href="pessoal.html" class="dock-btn">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
@@ -246,7 +247,7 @@ body {
       </svg>
       Profissional
     </a>
-  </div>
+</div>
 
 <script>
 const days = document.querySelectorAll('.day');
@@ -259,13 +260,27 @@ const exportPDFBtn = document.getElementById('exportPDF');
 // Função para criar tarefa
 function createTask(text, color = '') {
     const task = document.createElement('div');
-    task.innerText = text;
     task.className = 'task';
     task.setAttribute('draggable', 'true');
     task.style.backgroundColor = color;
 
-    // Alternar cor ao clicar
-    task.addEventListener('click', () => {
+    // Texto da tarefa
+    const span = document.createElement('span');
+    span.innerText = text;
+
+    // Botão de remover
+    const removeBtn = document.createElement('button');
+    removeBtn.innerText = '✖';
+    removeBtn.addEventListener('click', () => {
+        task.remove();
+        saveBoard();
+    });
+
+    task.appendChild(span);
+    task.appendChild(removeBtn);
+
+    // Alternar cor ao clicar no texto (não no botão)
+    span.addEventListener('click', () => {
         task.style.backgroundColor = task.style.backgroundColor === 'rgb(242, 132, 130)' ? '#4ecdc4' : '#f28482';
         saveBoard();
     });
@@ -278,10 +293,26 @@ function createTask(text, color = '') {
     return task;
 }
 
-// Adicionar eventos drag para tarefas existentes
+// Adicionar eventos drag para tarefas pré-definidas
 tasksContainer.querySelectorAll('.task').forEach(task => {
+    const span = task.querySelector('span');
+    const removeBtn = task.querySelector('button');
+
+    // Drag
     task.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('text/plain', task.innerText);
+        e.dataTransfer.setData('text/plain', span.innerText);
+    });
+
+    // Remover
+    removeBtn.addEventListener('click', () => {
+        task.remove();
+        saveBoard();
+    });
+
+    // Alternar cor
+    span.addEventListener('click', () => {
+        task.style.backgroundColor = task.style.backgroundColor === 'rgb(242, 132, 130)' ? '#4ecdc4' : '#f28482';
+        saveBoard();
     });
 });
 
@@ -327,8 +358,9 @@ function saveBoard() {
     days.forEach(day => {
         board[day.id] = [];
         day.querySelectorAll('.task').forEach(task => {
+            const span = task.querySelector('span');
             board[day.id].push({
-                text: task.innerText,
+                text: span.innerText,
                 color: task.style.backgroundColor || ''
             });
         });

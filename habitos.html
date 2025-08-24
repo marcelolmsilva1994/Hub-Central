@@ -50,7 +50,8 @@ tr:nth-child(even) { background:rgba(0,0,0,0.03); }
     <label><input type="checkbox" id="ginasio"> Ir ao Ginásio</label>
     <label><input type="checkbox" id="caminhar"> Caminhar 10.000 passos</label>
     <label><input type="checkbox" id="ler"> Ler 15 minutos</label>
-    <label><input type="checkbox" id="alimentacao"> Alimentação Saudável</label>
+    <label><input type="checkbox" id="fruta"> 2 peças de fruta</label>
+    <label><input type="checkbox" id="alimentacao"> Refeições Saudáveis</label>
     <label><input type="checkbox" id="cafes"> 2 cafés/dia</label>
     <label><input type="checkbox" id="planear"> Planear o dia de manhã</label>
     <label><input type="checkbox" id="rever"> Rever objetivos à noite</label>
@@ -124,6 +125,7 @@ function saveLog() {
     document.getElementById('ginasio').checked,
     document.getElementById('caminhar').checked,
     document.getElementById('ler').checked,
+    document.getElementById('fruta').checked,
     document.getElementById('alimentacao').checked,
     document.getElementById('cafes').checked,    
     document.getElementById('planear').checked,
@@ -219,3 +221,5 @@ renderChart();
 </script>
 </body>
 </html>
+
+
